@@ -1,8 +1,6 @@
 # SM64Wrapper
 Un petit module Python pour l'édition de la RAM de Super Mario 64
 
-**Il doit être lancé en administrateur**
-
 ## Prérequis
 **OS**: Windows 10
 
