@@ -10,6 +10,8 @@ Un petit module Python pour l'édition de la RAM de Super Mario 64
 
 **Emulator**: Project 64 v1.6
 
+**Rom**: Super Mario 64 (US)
+
 ## Bibliothéques requis
 ```
 psutil==5.5.0
