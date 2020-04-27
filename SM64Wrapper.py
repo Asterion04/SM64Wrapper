@@ -10,14 +10,14 @@ init()
 
 class RAM:
 
-    def __init__(self, debugMode: bool = False):
+    def __init__(self, debug_mode: bool = False):
         self.pid: int = None
         self.pm: pymem = None
-        self.isEmuOpen: bool = False
-        self.basePtr: int = None
-        self.debugMode = debugMode
+        self.is_emuOpen: bool = False
+        self.base_ptr: int = None
+        self.debug_mode = debug_mode
 
-        self.__memoryMap = {
+        self.__memory_map = {
             'level': 0x8033B249,
             'lives': 0x8033B21E,
             'stars': 0x8033B218,
@@ -29,7 +29,7 @@ class RAM:
             'zPos': 0x8033B1B4
         }
 
-    def debugLog(self, message: str, addr: str = None):
+    def debug_log(self, message: str, addr: str = None):
         if addr:
             print(Fore.YELLOW + f"[DEBUG {datetime.datetime.now().time()}]" + Fore.RESET + f" {message} " +
                   Fore.GREEN + f"{hex(int(addr, 16))}" + Fore.RESET)
@@ -45,12 +45,12 @@ class RAM:
                         self.pm = pymem.Pymem()
                 if self.pid:
                     self.pm.open_process_from_id(self.pid)
-                    self.isEmuOpen = True
-                    self.basePtr = hex(self.pm.read_int(0x7C640000) & (2 ** 32 - 1))
+                    self.is_emuOpen = True
+                    self.base_ptr = hex(self.pm.read_int(0x7C640000) & (2 ** 32 - 1))
 
-                    if self.debugMode:
-                        self.debugLog(f"Process pid {self.pid} has been opened")
-                        self.debugLog(f"Base Pointer of SM64 is {self.basePtr}")
+                    if self.debug_mode:
+                        self.debug_log(f"Process pid {self.pid} has been opened")
+                        self.debug_log(f"Base Pointer of SM64 is {self.base_ptr}")
 
                 else:
                     raise Exception('RAM: Emulator not running')
@@ -63,10 +63,10 @@ class RAM:
     ''' Read value from SM64 '''
 
     def currentLevel(self) -> str:
-        if self.isEmuOpen:
-            addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('level'))[3:]
-            if self.debugMode:
-                self.debugLog("Address of the current level :", addrStr)
+        if self.is_emuOpen:
+            addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('level'))[3:]
+            if self.debug_mode:
+                self.debug_log("Address of the current level :", addr_str)
 
             level_dict = {
                 0x00: "None",
@@ -103,46 +103,46 @@ class RAM:
                 0x24: "Tall Tall Mountain"
             }
 
-            level_number = self.pm.read_bytes(int(addrStr, 16), 2)[1]
+            level_number = self.pm.read_bytes(int(addr_str, 16), 2)[1]
             return level_dict.get(level_number)
 
         else:
             raise Exception("RAM: Emulator not open")
 
     def getLives(self) -> int:
-        if self.isEmuOpen:
-            addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('lives'))[3:]
-            if self.debugMode:
-                self.debugLog("Address of the lives :", addrStr)
+        if self.is_emuOpen:
+            addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('lives'))[3:]
+            if self.debug_mode:
+                self.debug_log("Address of the lives :", addr_str)
 
-            return self.pm.read_int(int(addrStr, 16))
+            return self.pm.read_int(int(addr_str, 16))
         else:
             raise Exception("RAM: Emulator not open")
 
     def getStars(self) -> int:
-        if self.isEmuOpen:
-            addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('stars'))[3:]
-            if self.debugMode:
-                self.debugLog("Address of the stars :", addrStr)
-            return int.from_bytes(self.pm.read_bytes(int(addrStr, 16), 1), "big")
+        if self.is_emuOpen:
+            addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('stars'))[3:]
+            if self.debug_mode:
+                self.debug_log("Address of the stars :", addr_str)
+            return int.from_bytes(self.pm.read_bytes(int(addr_str, 16), 1), "big")
         else:
             raise Exception("RAM: Emulator not open")
 
     def getCoins(self) -> int:
-        if self.isEmuOpen:
-            addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('coins'))[3:]
-            if self.debugMode:
-                self.debugLog("Address of the coins :", addrStr)
-            return int.from_bytes(self.pm.read_bytes(int(addrStr, 16), 1), "big")
+        if self.is_emuOpen:
+            addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('coins'))[3:]
+            if self.debug_mode:
+                self.debug_log("Address of the coins :", addr_str)
+            return int.from_bytes(self.pm.read_bytes(int(addr_str, 16), 1), "big")
         else:
             raise Exception("RAM: Emulator not open")
 
     def getHealth(self) -> int:
-        if self.isEmuOpen:
-            addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('health'))[3:]
-            if self.debugMode:
-                self.debugLog("Address of the health :", addrStr)
-            return int.from_bytes(self.pm.read_bytes(int(addrStr, 16), 1), "big")
+        if self.is_emuOpen:
+            addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('health'))[3:]
+            if self.debug_mode:
+                self.debug_log("Address of the health :", addr_str)
+            return int.from_bytes(self.pm.read_bytes(int(addr_str, 16), 1), "big")
         else:
             raise Exception("RAM: Emulator not open")
 
@@ -150,67 +150,67 @@ class RAM:
 
     def setCoins(self, coins: int = None):
         if coins is not None:
-            if self.isEmuOpen:
-                addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('coins'))[3:]
-                self.pm.write_uchar(int(addrStr, 16), coins)
+            if self.is_emuOpen:
+                addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('coins'))[3:]
+                self.pm.write_uchar(int(addr_str, 16), coins)
             else:
                 raise Exception("RAM: Emulator not open")
 
     def setLives(self, lives: int = None):
         if lives is not None:
-            if self.isEmuOpen:
-                addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('lives'))[3:]
-                self.pm.write_int(int(addrStr, 16), lives)
+            if self.is_emuOpen:
+                addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('lives'))[3:]
+                self.pm.write_int(int(addr_str, 16), lives)
             else:
                 raise Exception("RAM: Emulator not open")
 
     def setStars(self, stars: int = None):
         if stars is not None:
-            if self.isEmuOpen:
-                addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('stars'))[3:]
-                self.pm.write_uchar(int(addrStr, 16), stars)
+            if self.is_emuOpen:
+                addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('stars'))[3:]
+                self.pm.write_uchar(int(addr_str, 16), stars)
             else:
                 raise Exception("RAM: Emulator not open")
 
     def setHealth(self, health: int = None):
         if health is not None:
-            if self.isEmuOpen:
-                addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('health'))[3:]
-                self.pm.write_uchar(int(addrStr, 16), health)
+            if self.is_emuOpen:
+                addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('health'))[3:]
+                self.pm.write_uchar(int(addr_str, 16), health)
             else:
                 raise Exception("RAM: Emulator not open")
 
     ''' Event '''
 
     def restartLevel(self):
-        if self.isEmuOpen:
-            addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('restartLevel'))[3:]
-            self.pm.write_uchar(int(addrStr, 16), 2)
+        if self.is_emuOpen:
+            addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('restartLevel'))[3:]
+            self.pm.write_uchar(int(addr_str, 16), 2)
         else:
             raise Exception("RAM: Emulator not open")
 
 
     def killMario(self):
-        if self.isEmuOpen:
-            addrStr = hex(int(self.basePtr, 0) + self.__memoryMap.get('health'))[3:]
-            self.pm.write_uchar(int(addrStr, 16), 0)
+        if self.is_emuOpen:
+            addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('health'))[3:]
+            self.pm.write_uchar(int(addr_str, 16), 0)
         else:
             raise Exception("RAM: Emulator not open")
 
     def freezePos(self, timer: int = 3):
-        if self.isEmuOpen:
-            addrX = hex(int(self.basePtr, 0) + self.__memoryMap.get('xPos'))[3:]
-            addrY = hex(int(self.basePtr, 0) + self.__memoryMap.get('yPos'))[3:]
-            addrZ = hex(int(self.basePtr, 0) + self.__memoryMap.get('zPos'))[3:]
-            x = self.pm.read_int(int(addrX, 16))
-            y = self.pm.read_int(int(addrY, 16))
-            z = self.pm.read_int(int(addrZ, 16))
+        if self.is_emuOpen:
+            addr_x = hex(int(self.base_ptr, 0) + self.__memory_map.get('xPos'))[3:]
+            addr_y = hex(int(self.base_ptr, 0) + self.__memory_map.get('yPos'))[3:]
+            addr_z = hex(int(self.base_ptr, 0) + self.__memory_map.get('zPos'))[3:]
+            x = self.pm.read_int(int(addr_x, 16))
+            y = self.pm.read_int(int(addr_y, 16))
+            z = self.pm.read_int(int(addr_z, 16))
 
             t_end = time.time() + timer
             while time.time() < t_end:
-                self.pm.write_int(int(addrX, 16), x)
-                self.pm.write_int(int(addrY, 16), y)
-                self.pm.write_int(int(addrZ, 16), z)
+                self.pm.write_int(int(addr_x, 16), x)
+                self.pm.write_int(int(addr_y, 16), y)
+                self.pm.write_int(int(addr_z, 16), z)
         else:
             raise Exception("RAM: Emulator not open")
 
@@ -223,37 +223,37 @@ class Cap:
             raise Exception("Control: RAM class is needed")
 
     def reset(self):
-        if self.main.isEmuOpen:
-            addrStr = hex(int(self.main.basePtr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addrStr, 16), 17)
+        if self.main.is_emuOpen:
+            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
+            self.main.pm.write_int(int(addr_str, 16), 17)
         else:
             raise Exception("Control: Emulator not open")
 
     def wing(self):
-        if self.main.isEmuOpen:
-            addrStr = hex(int(self.main.basePtr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addrStr, 16), 280)
+        if self.main.is_emuOpen:
+            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
+            self.main.pm.write_int(int(addr_str, 16), 280)
         else:
             raise Exception("Control: Emulator not open")
 
     def no_hat(self):
-        if self.main.isEmuOpen:
-            addrStr = hex(int(self.main.basePtr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addrStr, 16), 1)
+        if self.main.is_emuOpen:
+            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
+            self.main.pm.write_int(int(addr_str, 16), 1)
         else:
             raise Exception("Control: Emulator not open")
 
     def metal(self):
-        if self.main.isEmuOpen:
-            addrStr = hex(int(self.main.basePtr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addrStr, 16), 20)
+        if self.main.is_emuOpen:
+            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
+            self.main.pm.write_int(int(addr_str, 16), 20)
         else:
             raise Exception("Control: Emulator not open")
 
     def completely_invisible(self):
-        if self.main.isEmuOpen:
-            addrStr = hex(int(self.main.basePtr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addrStr, 16), 136)
+        if self.main.is_emuOpen:
+            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
+            self.main.pm.write_int(int(addr_str, 16), 136)
         else:
             raise Exception("Control: Emulator not open")
 
@@ -264,55 +264,55 @@ class Animation:
         if isinstance(sm64wrapper, RAM):
             self.RAM = sm64wrapper
 
-            self.__oncePunch = True
-            self.__onceCrouch = True
-            self.__onceDive = True
-            self.__onceSpin = True
+            self.__once_punch = True
+            self.__once_crouch = True
+            self.__once_dive = True
+            self.__once_spin = True
         else:
             raise Exception("Control: RAM class is needed")
 
     def punch(self):
-        if self.RAM.isEmuOpen:
-            addrStr = hex(int(self.RAM.basePtr, 0) + int("0x8033B17C", 0))[3:]
-            if self.RAM.debugMode and self.__oncePunch:
-                self.RAM.debugLog("Animation of the punch is the value 8389504 at", addrStr)
-                self.__oncePunch = False
-            self.RAM.pm.write_int(int(addrStr, 16), 8389504)
+        if self.RAM.is_emuOpen:
+            addr_str = hex(int(self.RAM.base_ptr, 0) + int("0x8033B17C", 0))[3:]
+            if self.RAM.debug_mode and self.__once_punch:
+                self.RAM.debug_log("Animation of the punch is the value 8389504 at", addr_str)
+                self.__once_punch = False
+            self.RAM.pm.write_int(int(addr_str, 16), 8389504)
         else:
             raise Exception("Control: Emulator not open")
 
     def crouch(self):
         if self.RAM:
-            if self.RAM.isEmuOpen:
-                addrStr = hex(int(self.RAM.basePtr, 0) + 0x8033B17C)[3:]
-                if self.RAM.debugMode and self.__onceCrouch:
-                    self.RAM.debugLog("Animation of the crouch is the value 201359904 at", addrStr)
-                    self.__onceCrouch = False
-                self.RAM.pm.write_int(int(addrStr, 16), 201359904)
+            if self.RAM.is_emuOpen:
+                addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033B17C)[3:]
+                if self.RAM.debug_mode and self.__once_crouch:
+                    self.RAM.debug_log("Animation of the crouch is the value 201359904 at", addr_str)
+                    self.__once_crouch = False
+                self.RAM.pm.write_int(int(addr_str, 16), 201359904)
             else:
                 raise Exception("Control: Emulator not open")
 
     def dive(self):
         if self.RAM:
-            if self.RAM.isEmuOpen:
-                addrStr = hex(int(self.RAM.basePtr, 0) + 0x8033B17C)[3:]
-                if self.RAM.debugMode and self.__onceDive:
-                    self.RAM.debugLog("Animation of the dive is the value 8914006 at", addrStr)
-                    self.__onceDive = False
-                self.RAM.pm.write_int(int(addrStr, 16), 8914006)
+            if self.RAM.is_emuOpen:
+                addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033B17C)[3:]
+                if self.RAM.debug_mode and self.__once_dive:
+                    self.RAM.debug_log("Animation of the dive is the value 8914006 at", addr_str)
+                    self.__once_dive = False
+                self.RAM.pm.write_int(int(addr_str, 16), 8914006)
             else:
                 raise Exception("Control: Emulator not open")
 
     def spin_forward(self):
         if self.RAM:
-            if self.RAM.isEmuOpen:
-                addrStr = hex(int(self.RAM.basePtr, 0) + 0x8033B17C)[3:]
-                if self.RAM.debugMode and self.__onceSpin:
-                    self.RAM.debugLog("Animation of the spin_forward is the value 16779430 at", addrStr)
-                    self.__onceSpin = False
+            if self.RAM.is_emuOpen:
+                addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033B17C)[3:]
+                if self.RAM.debug_mode and self.__once_spin:
+                    self.RAM.debug_log("Animation of the spin_forward is the value 16779430 at", addr_str)
+                    self.__once_spin = False
                 t_end = time.time() + 0.1
                 while time.time() < t_end:
-                    self.RAM.pm.write_int(int(addrStr, 16), 16779430)
+                    self.RAM.pm.write_int(int(addr_str, 16), 16779430)
             else:
                 raise Exception("Control: Emulator not open")
 
@@ -321,56 +321,45 @@ class CheckInput:
     def __init__(self, sm64wrapper):
         if isinstance(sm64wrapper, RAM):
             self.RAM = sm64wrapper
-            self.__onceA = True
-            self.__onceB = True
-            self.__onceZ = True
+            self.__once_A = True
+            self.__once_B = True
+            self.__once_Z = True
+            self.__once_nothing = True
         else:
             raise Exception("Control: RAM class is needed")
 
-    def nothing(self):
-        if self.RAM.isEmuOpen:
-            addrStr = hex(int(self.RAM.basePtr, 0) + 0x8033AFA0)[3:]
-            if self.RAM.debugMode and self.__onceA:
-                self.RAM.debugLog("Address of the button A :", addrStr)
-                self.__onceA = False
-
-            current_button = hex(self.RAM.pm.read_uint(int(addrStr, 16)))
-            return current_button == "0x00000000"
-        else:
-            raise Exception("RAM: Emulator not open")
-
     def A(self) -> bool:
-        if self.RAM.isEmuOpen:
-            addrStr = hex(int(self.RAM.basePtr, 0) + 0x8033AFA0)[3:]
-            if self.RAM.debugMode and self.__onceA:
-                self.RAM.debugLog("Address of the button A :", addrStr)
-                self.__onceA = False
+        if self.RAM.is_emuOpen:
+            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033AFA0)[3:]
+            if self.RAM.debug_mode and self.__once_A:
+                self.RAM.debug_log("Address of the button A :", addr_str)
+                self.__once_A = False
 
-            current_button = hex(self.RAM.pm.read_uint(int(addrStr, 16)))[:5]
+            current_button = hex(self.RAM.pm.read_uint(int(addr_str, 16)))[:5]
             return current_button == "0x800"
         else:
             raise Exception("RAM: Emulator not open")
 
     def B(self) -> bool:
-        if self.RAM.isEmuOpen:
-            addrStr = hex(int(self.RAM.basePtr, 0) + 0x8033AFA0)[3:]
-            if self.RAM.debugMode and self.__onceB:
-                self.RAM.debugLog("Address of the button B :", addrStr)
-                self.__onceB = False
+        if self.RAM.is_emuOpen:
+            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033AFA0)[3:]
+            if self.RAM.debug_mode and self.__once_B:
+                self.RAM.debug_log("Address of the button B :", addr_str)
+                self.__once_B = False
 
-            current_button = hex(self.RAM.pm.read_uint(int(addrStr, 16)))[:5]
+            current_button = hex(self.RAM.pm.read_uint(int(addr_str, 16)))[:5]
             return current_button == "0x400"
         else:
             raise Exception("RAM: Emulator not open")
 
     def Z(self) -> bool:
-        if self.RAM.isEmuOpen:
-            addrStr = hex(int(self.RAM.basePtr, 0) + 0x8033AFA0)[3:]
-            if self.RAM.debugMode and self.__onceZ:
-                self.RAM.debugLog("Address of the button Z :", addrStr)
-                self.__onceZ = False
+        if self.RAM.is_emuOpen:
+            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033AFA0)[3:]
+            if self.RAM.debug_mode and self.__once_Z:
+                self.RAM.debug_log("Address of the button Z :", addr_str)
+                self.__once_Z = False
 
-            current_button = hex(self.RAM.pm.read_uint(int(addrStr, 16)))
+            current_button = hex(self.RAM.pm.read_uint(int(addr_str, 16)))
             return current_button[:5] == "0x200" and len(current_button) > 7
         else:
             raise Exception("RAM: Emulator not open")
