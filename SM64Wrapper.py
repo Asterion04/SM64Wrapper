@@ -14,7 +14,7 @@ class RAM:
         self.pid: int = None
         self.pm: pymem = None
         self.is_emuOpen: bool = False
-        self.base_ptr: int = None
+        self.base_ptr: str = None
         self.debug_mode = debug_mode
 
         self.__memory_map = {
@@ -218,42 +218,42 @@ class RAM:
 class Cap:
     def __init__(self, sm64wrapper):
         if isinstance(sm64wrapper, RAM):
-            self.main = sm64wrapper
+            self.RAM = sm64wrapper
         else:
             raise Exception("Control: RAM class is needed")
 
     def reset(self):
-        if self.main.is_emuOpen:
-            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addr_str, 16), 17)
+        if self.RAM.is_emuOpen:
+            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033B174)[3:]
+            self.RAM.pm.write_int(int(addr_str, 16), 17)
         else:
             raise Exception("Control: Emulator not open")
 
     def wing(self):
-        if self.main.is_emuOpen:
-            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addr_str, 16), 280)
+        if self.RAM.is_emuOpen:
+            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033B174)[3:]
+            self.RAM.pm.write_int(int(addr_str, 16), 280)
         else:
             raise Exception("Control: Emulator not open")
 
     def no_hat(self):
-        if self.main.is_emuOpen:
-            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addr_str, 16), 1)
+        if self.RAM.is_emuOpen:
+            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033B174)[3:]
+            self.RAM.pm.write_int(int(addr_str, 16), 1)
         else:
             raise Exception("Control: Emulator not open")
 
     def metal(self):
-        if self.main.is_emuOpen:
-            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addr_str, 16), 20)
+        if self.RAM.is_emuOpen:
+            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033B174)[3:]
+            self.RAM.pm.write_int(int(addr_str, 16), 20)
         else:
             raise Exception("Control: Emulator not open")
 
     def completely_invisible(self):
-        if self.main.is_emuOpen:
-            addr_str = hex(int(self.main.base_ptr, 0) + 0x8033B174)[3:]
-            self.main.pm.write_int(int(addr_str, 16), 136)
+        if self.RAM.is_emuOpen:
+            addr_str = hex(int(self.RAM.base_ptr, 16) + 0x8033B174)[3:]
+            self.RAM.pm.write_int(int(addr_str, 16), 136)
         else:
             raise Exception("Control: Emulator not open")
 
@@ -324,13 +324,15 @@ class CheckInput:
             self.__once_A = True
             self.__once_B = True
             self.__once_Z = True
-            self.__once_nothing = True
+
+            self.button_address = 0x8033AFA0
+
         else:
             raise Exception("Control: RAM class is needed")
 
     def A(self) -> bool:
         if self.RAM.is_emuOpen:
-            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033AFA0)[3:]
+            addr_str = hex(int(self.RAM.base_ptr, 0) + self.button_address)[3:]
             if self.RAM.debug_mode and self.__once_A:
                 self.RAM.debug_log("Address of the button A :", addr_str)
                 self.__once_A = False
@@ -342,7 +344,7 @@ class CheckInput:
 
     def B(self) -> bool:
         if self.RAM.is_emuOpen:
-            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033AFA0)[3:]
+            addr_str = hex(int(self.RAM.base_ptr, 0) + self.button_address)[3:]
             if self.RAM.debug_mode and self.__once_B:
                 self.RAM.debug_log("Address of the button B :", addr_str)
                 self.__once_B = False
@@ -354,7 +356,7 @@ class CheckInput:
 
     def Z(self) -> bool:
         if self.RAM.is_emuOpen:
-            addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033AFA0)[3:]
+            addr_str = hex(int(self.RAM.base_ptr, 0) + self.button_address)[3:]
             if self.RAM.debug_mode and self.__once_Z:
                 self.RAM.debug_log("Address of the button Z :", addr_str)
                 self.__once_Z = False
@@ -363,3 +365,4 @@ class CheckInput:
             return current_button[:5] == "0x200" and len(current_button) > 7
         else:
             raise Exception("RAM: Emulator not open")
+            
