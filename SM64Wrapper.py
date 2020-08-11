@@ -37,6 +37,14 @@ class RAM:
             print(Fore.YELLOW + f"[DEBUG {datetime.datetime.now().time()}]" + Fore.RESET + f" {message}")
 
     def openEmu(self, emu_name: str = '') -> bool:
+        """Open process by name
+
+        Parameters
+        ----------
+        emu_name: str
+            Name of the emulator
+
+        """
         if emu_name:
             if emu_name in ['Project64']:
                 for Process in psutil.process_iter():
@@ -63,6 +71,8 @@ class RAM:
     ''' Read value from SM64 '''
 
     def currentLevel(self) -> str:
+        """Return the level where Mario is"""
+
         if self.is_emuOpen:
             addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('level'))[3:]
             if self.debug_mode:
@@ -110,6 +120,8 @@ class RAM:
             raise Exception("RAM: Emulator not open")
 
     def getLives(self) -> int:
+        """Return the number of lives has Mario"""
+
         if self.is_emuOpen:
             addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('lives'))[3:]
             if self.debug_mode:
@@ -120,6 +132,8 @@ class RAM:
             raise Exception("RAM: Emulator not open")
 
     def getStars(self) -> int:
+        """Return number of stars has Mario"""
+
         if self.is_emuOpen:
             addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('stars'))[3:]
             if self.debug_mode:
@@ -129,6 +143,8 @@ class RAM:
             raise Exception("RAM: Emulator not open")
 
     def getCoins(self) -> int:
+        """Return number of coins has Mario"""
+
         if self.is_emuOpen:
             addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('coins'))[3:]
             if self.debug_mode:
@@ -138,6 +154,8 @@ class RAM:
             raise Exception("RAM: Emulator not open")
 
     def getHealth(self) -> int:
+        """Return the current health has Mario"""
+
         if self.is_emuOpen:
             addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('health'))[3:]
             if self.debug_mode:
@@ -149,6 +167,8 @@ class RAM:
     ''' Write value to SM64 '''
 
     def setCoins(self, coins: int = None):
+        """Set number of coins"""
+
         if coins is not None:
             if self.is_emuOpen:
                 addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('coins'))[3:]
@@ -157,6 +177,8 @@ class RAM:
                 raise Exception("RAM: Emulator not open")
 
     def setLives(self, lives: int = None):
+        """Set number of lives"""
+
         if lives is not None:
             if self.is_emuOpen:
                 addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('lives'))[3:]
@@ -173,6 +195,7 @@ class RAM:
                 raise Exception("RAM: Emulator not open")
 
     def setHealth(self, health: int = None):
+        """Set the number of health (0 - 8) """
         if health is not None:
             if self.is_emuOpen:
                 addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('health'))[3:]
@@ -183,6 +206,8 @@ class RAM:
     ''' Event '''
 
     def restartLevel(self):
+        """Restart the level"""
+
         if self.is_emuOpen:
             addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('restartLevel'))[3:]
             self.pm.write_uchar(int(addr_str, 16), 2)
@@ -191,6 +216,8 @@ class RAM:
 
 
     def killMario(self):
+        """Kill Mario instantly by setting his health to 0"""
+
         if self.is_emuOpen:
             addr_str = hex(int(self.base_ptr, 0) + self.__memory_map.get('health'))[3:]
             self.pm.write_uchar(int(addr_str, 16), 0)
@@ -198,6 +225,8 @@ class RAM:
             raise Exception("RAM: Emulator not open")
 
     def freezePos(self, timer: int = 3):
+        """Freezes Mario's position for 3 seconds by default"""
+
         if self.is_emuOpen:
             addr_x = hex(int(self.base_ptr, 0) + self.__memory_map.get('xPos'))[3:]
             addr_y = hex(int(self.base_ptr, 0) + self.__memory_map.get('yPos'))[3:]
@@ -223,6 +252,8 @@ class Cap:
             raise Exception("Control: RAM class is needed")
 
     def reset(self):
+        """Reset Mario's cap as default"""
+
         if self.RAM.is_emuOpen:
             addr_str = hex(int(self.RAM.base_ptr, 0) + 0x8033B174)[3:]
             self.RAM.pm.write_int(int(addr_str, 16), 17)
@@ -272,6 +303,8 @@ class Animation:
             raise Exception("Control: RAM class is needed")
 
     def punch(self):
+        """Play Mario's punch animation"""
+
         if self.RAM.is_emuOpen:
             addr_str = hex(int(self.RAM.base_ptr, 0) + int("0x8033B17C", 0))[3:]
             if self.RAM.debug_mode and self.__once_punch:
@@ -331,6 +364,8 @@ class CheckInput:
             raise Exception("Control: RAM class is needed")
 
     def A(self) -> bool:
+        """Check if 'A' button is pressed"""
+
         if self.RAM.is_emuOpen:
             addr_str = hex(int(self.RAM.base_ptr, 0) + self.button_address)[3:]
             if self.RAM.debug_mode and self.__once_A:
@@ -343,6 +378,8 @@ class CheckInput:
             raise Exception("RAM: Emulator not open")
 
     def B(self) -> bool:
+        """Check if 'B' button is pressed"""
+
         if self.RAM.is_emuOpen:
             addr_str = hex(int(self.RAM.base_ptr, 0) + self.button_address)[3:]
             if self.RAM.debug_mode and self.__once_B:
@@ -355,6 +392,8 @@ class CheckInput:
             raise Exception("RAM: Emulator not open")
 
     def Z(self) -> bool:
+        """Check if 'Z' button is pressed"""
+
         if self.RAM.is_emuOpen:
             addr_str = hex(int(self.RAM.base_ptr, 0) + self.button_address)[3:]
             if self.RAM.debug_mode and self.__once_Z:
@@ -365,4 +404,3 @@ class CheckInput:
             return current_button[:5] == "0x200" and len(current_button) > 7
         else:
             raise Exception("RAM: Emulator not open")
-            
